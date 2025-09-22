@@ -22,13 +22,8 @@ export default function ProductList() {
 
   useEffect(getProducts, []);
 
-  // ===========================
-  // FUNGSI DELETE
-  // ===========================
+  // Fungsi delete tanpa konfirmasi
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this product?"))
-      return;
-
     try {
       const res = await fetch(`http://localhost:5000/products/${id}`, {
         method: "DELETE",
