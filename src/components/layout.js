@@ -1,10 +1,13 @@
+import { Link } from "react-router-dom";
+
 export function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg bg-white border-bottom box-shadow">
       <div className="container">
-        <a className="navbar-brand" href="#">
-         <img src="/commers.png" /> Best Store
-        </a>
+        <Link className="navbar-brand" to="/">
+          <img src="/commers.png" alt="..." width="30" className="me-2" /> Best
+          Store
+        </Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -19,65 +22,60 @@ export function Navbar() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">
+              <Link className="nav-link text-dark" aria-current="page" to="#">
                 Home
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">
-                Link
-              </a>
+              <Link className="nav-link text-dark" to="/contact">
+                Contact
+              </Link>
             </li>
+          </ul>
+          <ul className="navbar-nav">
             <li className="nav-item dropdown">
               <a
-                className="nav-link dropdown-toggle"
+                className="nav-link dropdown-toggle text-dark"
                 href="#"
                 role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                Dropdown
+                Admin
               </a>
               <ul className="dropdown-menu">
                 <li>
-                  <a className="dropdown-item" href="#">
-                    Action
-                  </a>
+                  <Link className="dropdown-item" to="/admin/products">
+                    Products
+                  </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
-                    Another action
-                  </a>
+                  <Link className="dropdown-item" to="/profile">
+                    Profile
+                  </Link>
                 </li>
                 <li>
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
-                    Something else here
-                  </a>
+                  <Link className="dropdown-item" to="/logout">
+                    Log out
+                  </Link>
                 </li>
               </ul>
             </li>
-            <li className="nav-item">
-              <a className="nav-link disabled" aria-disabled="true">
-                Disabled
-              </a>
-            </li>
           </ul>
-          <form className="d-flex" role="search">
-            <input
-              className="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button className="btn btn-outline-success" type="submit">
-              Search
-            </button>
-          </form>
         </div>
       </div>
     </nav>
+  );
+}
+
+export function Footer() {
+  return (
+    <div className="text-center p-4 border-top">
+      <img src="/commers.png" alt="..." width="30" className="me-2" />
+      Best Store
+    </div>
   );
 }
