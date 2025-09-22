@@ -3,35 +3,46 @@ import { Link } from "react-router-dom";
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
-  const [error, setError] = useState(null); 
-  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   function getProducts() {
     setLoading(true);
     setError(null);
-    fetch("http://localhost:5000/products")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
+
+    fetch("http://localhost:5000/products?_sort=id&_order=desc")
+      .then((res) => {
+        if (!res.ok) throw new Error("Network response not ok");
+        return res.json();
       })
-      .then((data) => {
-        setProducts(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setError(
-          "Unable to get the data. Please check your network and server connection."
-        );
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      .then((data) => setProducts(data))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   }
 
-  // panggil otomatis sekali di awal
   useEffect(getProducts, []);
+
+  // ===========================
+  // FUNGSI DELETE
+  // ===========================
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/products/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Failed to delete product");
+
+      // update state supaya langsung hilang dari tabel
+      setProducts(products.filter((product) => product.id !== id));
+      alert("Product deleted successfully");
+    } catch (err) {
+      alert("Error deleting product: " + err.message);
+    }
+  };
 
   return (
     <div className="container mt-4">
@@ -39,29 +50,17 @@ export default function ProductList() {
 
       <div className="row mb-3">
         <div className="col"></div>
-        <Link
-          className="btn btn-primary me-2"
-          to="/admin/products/create"
-          role="button"
-        >
+        <Link className="btn btn-primary me-2" to="/admin/products/create">
           Create Products
         </Link>
-        <button
-          type="button"
-          className="btn btn-outline-primary"
-          onClick={getProducts}
-        >
+        <button className="btn btn-outline-primary" onClick={getProducts}>
           Refresh
         </button>
         <div className="col"></div>
       </div>
 
       {loading && <div className="text-center">Loading...</div>}
-      {error && (
-        <div className="alert alert-danger" role="alert">
-          {error}
-        </div>
-      )}
+      {error && <div className="alert alert-danger">{error}</div>}
 
       {!loading && !error && (
         <table className="table">
@@ -78,39 +77,41 @@ export default function ProductList() {
             </tr>
           </thead>
           <tbody>
-            {products.map((product, index) => {
-              return (
-                <tr key={index}>
-                  <td>{product.id}</td>
-                  <td>{product.name}</td>
-                  <td>{product.brand}</td>
-                  <td>{product.category}</td>
-                  <td>{product.price}</td>
-                  <td>
+            {products.map((p, i) => (
+              <tr key={i}>
+                <td>{p.id}</td>
+                <td>{p.name || "-"}</td>
+                <td>{p.brand || "-"}</td>
+                <td>{p.category || "-"}</td>
+                <td>{p.price ?? "-"}</td>
+                <td>
+                  {p.imageFilename ? (
                     <img
-                      src={
-                        "http://localhost:5000/images/" + product.imageFilename
-                      }
+                      src={`http://localhost:5000/images/${p.imageFilename}`}
                       width="100"
-                      alt={product.name}
+                      alt={p.name}
                     />
-                  </td>
-                  <td>{product.createdAt.slice(0, 10)}</td>
-
-                  <td style={{ width: "10px", whiteSpace: "nowrap" }}>
-                    <Link
-                      className="btn btn-primary btn-sm me-1"
-                      to={"/admin/products/edit/" + product.id}
-                    >
-                      Edit
-                    </Link>
-                    <button type="button" className="btn btn-danger btn-sm">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td>{p.createdAt?.slice(0, 10) || "-"}</td>
+                <td>
+                  <Link
+                    className="btn btn-primary btn-sm me-1"
+                    to={`/admin/products/edit/${p.id}`}
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleDelete(p.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       )}
